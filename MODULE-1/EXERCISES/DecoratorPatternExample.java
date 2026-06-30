@@ -1,15 +1,11 @@
 public interface Notifier {
     void send(String message);
 }
-
-// EmailNotifier.java
 public class EmailNotifier implements Notifier {
     public void send(String message) {
         System.out.println("Sending EMAIL: " + message);
     }
 }
-
-// NotifierDecorator.java
 public abstract class NotifierDecorator implements Notifier {
     protected Notifier wrappedNotifier;
 
@@ -18,11 +14,10 @@ public abstract class NotifierDecorator implements Notifier {
     }
 
     public void send(String message) {
-        wrappedNotifier.send(message); // delegate first
+        wrappedNotifier.send(message);
     }
 }
 
-// SMSNotifierDecorator.java
 public class SMSNotifierDecorator extends NotifierDecorator {
     public SMSNotifierDecorator(Notifier notifier) {
         super(notifier);
@@ -35,7 +30,6 @@ public class SMSNotifierDecorator extends NotifierDecorator {
     }
 }
 
-// SlackNotifierDecorator.java
 public class SlackNotifierDecorator extends NotifierDecorator {
     public SlackNotifierDecorator(Notifier notifier) {
         super(notifier);

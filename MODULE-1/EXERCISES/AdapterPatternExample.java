@@ -1,22 +1,16 @@
 public interface PaymentProcessor {
     void processPayment(double amount);
 }
-
-// PayPalGateway.java — Adaptee with its own interface
 public class PayPalGateway {
     public void makePayPalPayment(double amountInUsd) {
         System.out.println("Processing $" + amountInUsd + " via PayPal API");
     }
 }
-
-// StripeGateway.java — Another adaptee with a different interface
 public class StripeGateway {
     public void charge(int amountInCents) {
         System.out.println("Charging " + amountInCents + " cents via Stripe API");
     }
 }
-
-// PayPalAdapter.java
 public class PayPalAdapter implements PaymentProcessor {
     private PayPalGateway payPalGateway;
 
@@ -28,8 +22,6 @@ public class PayPalAdapter implements PaymentProcessor {
         payPalGateway.makePayPalPayment(amount);
     }
 }
-
-// StripeAdapter.java
 public class StripeAdapter implements PaymentProcessor {
     private StripeGateway stripeGateway;
 
