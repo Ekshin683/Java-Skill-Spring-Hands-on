@@ -1,0 +1,26 @@
+Dependency Injection(DI) -> 
+
+1.Contructor Injection: Dependencies are passed through the constructor of the class. which makes class easy to test.
+
+Example:
+
+    @Service
+public class OrderService {
+
+    private final PaymentService paymentService;
+    private final EmailService emailService;
+
+    // Spring automatically uses this constructor for injection
+    @Autowired
+    public OrderService(PaymentService paymentService, EmailService emailService) {
+        this.paymentService = paymentService;
+        this.emailService = emailService;
+    }
+
+    public void placeOrder(String item, double amount) {
+        paymentService.charge(amount);
+        emailService.send("Order placed: " + item);
+    }
+}
+
+2.Setter Injection: 

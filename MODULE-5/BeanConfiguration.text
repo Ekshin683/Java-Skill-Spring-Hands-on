@@ -1,0 +1,74 @@
+Bean Configuration: instead of XML, we annotate the class and then spring will automatically create.
+There four anotations: 1.@component 2.@service 3.@repository 4.@controller
+
+Example:
+
+    // UserRepository.java
+package com.springdemo;
+
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class UserRepository {
+    public String findUser(int id) {
+        return "User-" + id; // simulated DB call
+    }
+}
+
+
+// UserService.java
+package com.springdemo;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class UserService {
+
+    @Autowired
+    private UserRepository userRepository; // Spring injects this
+
+    public String getUser(int id) {
+        return userRepository.findUser(id);
+    }
+}
+
+// AppConfig.java
+package com.springdemo;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration                          // marks this as a Spring config class
+@ComponentScan("com.springdemo")        // tells Spring where to look for @Component classes
+public class AppConfig {
+
+    // Manually define a bean when you can't annotate the class
+    @Bean
+    public Engine engine() {
+        Engine engine = new Engine();
+        engine.setHorsepower(300);
+        return engine;
+    }
+
+    @Bean
+    public Car car() {
+        Car car = new Car();
+        car.setEngine(engine()); // Spring ensures engine() returns the same singleton
+        car.setBrand("BMW");
+        return car;
+    }
+}
+
+
+// Main.java — using Java config instead of XML
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+public class Main {
+    public static void main(String[] args) {
+        var context = new AnnotationConfigApplicationContext(AppConfig.class);
+        Car car = context.getBean(Car.class);
+        car.drive();
+    }
+}

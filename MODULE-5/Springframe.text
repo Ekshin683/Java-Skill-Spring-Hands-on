@@ -1,0 +1,42 @@
+// package MODULE-5;
+
+//Spring FrameWork: It's an open-source framework that solves complexity of enterprise application development.
+//But, In spring itself write all the boilerplate code and configuration,manages the objects creation manullay.
+//spring works on the principles Inversion of Control(IOC) and Dependency Injections(DI).
+
+// public class Springframe {
+    
+// }
+
+Inversion of Control(IOC): It is a principle in which the control of objects or portions of a program is transferred to a container or framework.
+
+// Traditional Java
+public class OrderService {
+    private PaymentService paymentService;
+
+    public OrderService() {
+        this.paymentService = new PaymentService(); // we created the depenceny manually
+    }
+}
+
+// With Spring IoC
+@Component
+public class OrderService {
+    @Autowired
+    private PaymentService paymentService; // Spring will automatically inject the dependency
+}
+
+Dependency Injections(DI):  Insteaf of creating the dependencies manually, we inject the dependency from outside the class.
+//can't inject as it tightly coupled with GmailClient class
+public class EmailService {
+    private GmailClient client = new GmailClient(); // locked to Gmail forever
+}
+
+// Loosely coupled with DI
+public class EmailService {
+    private MailClient client; // depends on interface, not concrete class
+
+    public EmailService(MailClient client) { // injected from outside
+        this.client = client;
+    }
+}

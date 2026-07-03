@@ -1,0 +1,73 @@
+IOC container: It is heart of the Spring framework. It manages the entire life cycle of the beans and their dependencies.
+These are two type: 1.BeanFactor 2.ApplicatonContext.
+Mostly we use ApplicationContext as ot provides more features than beanfactor.
+
+Example:
+//Configuration file: beans.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Define a bean — Spring will create and manage this object -->
+    <bean id="engine" class="com.springdemo.Engine">
+        <property name="horsepower" value="250"/>
+    </bean>
+
+    <!-- Inject the engine bean into the car bean -->
+    <bean id="car" class="com.springdemo.Car">
+        <property name="engine" ref="engine"/>
+        <property name="brand" value="Toyota"/>
+    </bean>
+
+</beans>
+
+// Engine.java
+package com.springdemo;
+
+public class Engine {
+    private int horsepower;
+
+    public void setHorsepower(int horsepower) {
+        this.horsepower = horsepower;
+    }
+
+    public void start() {
+        System.out.println("Engine started with " + horsepower + " HP");
+    }
+}
+
+// Car.java
+package com.springdemo;
+
+public class Car {
+    private Engine engine;
+    private String brand;
+
+    public void setEngine(Engine engine) { this.engine = engine; }
+    public void setBrand(String brand) { this.brand = brand; }
+
+    public void drive() {
+        System.out.println(brand + " is driving...");
+        engine.start();
+    }
+}
+
+// Main.java
+package com.springdemo;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class Main {
+    public static void main(String[] args) {
+        // Load the IoC container from XML
+        ApplicationContext context =
+                new ClassPathXmlApplicationContext("applicationContext.xml");
+
+        // Get the bean — Spring already created it and injected engine into it
+        Car car = context.getBean("car", Car.class);
+        car.drive();
+    }
+}
