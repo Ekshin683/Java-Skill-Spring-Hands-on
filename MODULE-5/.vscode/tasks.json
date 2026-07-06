@@ -1,0 +1,29 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "LibraryManagementBoot: run",
+      "type": "shell",
+      "command": "${env:USERPROFILE}\\tools\\apache-maven-3.9.9\\bin\\mvn.cmd",
+      "args": ["spring-boot:run"],
+      "options": {
+        "cwd": "${workspaceFolder}/LibraryManagementBoot"
+      },
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "LibraryManagement: run",
+      "type": "shell",
+      "command": "${env:USERPROFILE}\\tools\\apache-maven-3.9.9\\bin\\mvn.cmd",
+      "args": ["org.codehaus.mojo:exec-maven-plugin:3.5.0:java", "-Dexec.mainClass=com.library.LibraryManagementApplication"],
+      "options": {
+        "cwd": "${workspaceFolder}/LibraryManagement"
+      },
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
+}
