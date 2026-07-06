@@ -1,0 +1,152 @@
+Entity Mapping: These shows How a java class is mapped to Database using anotations.
+
+Example:
+    // Student.java
+package com.jpademo.entity;
+
+import jakarta.persistence.*;
+import java.time.LocalDate;
+
+@Entity                          // marks this class as a JPA entity
+@Table(name = "students",        // maps to the "students" table
+       uniqueConstraints = {
+           @UniqueConstraint(columnNames = "email")
+       })
+public class Student {
+
+    // ── Primary Key ─────────────────────────────────────────
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // IDENTITY: DB auto-increments the id (MySQL AUTO_INCREMENT)
+    // SEQUENCE: uses a DB sequence object (PostgreSQL default)
+    // AUTO:     JPA picks the best strategy for the DB
+    // TABLE:    uses a separate table to track IDs (rare)
+    private Long id;
+
+    // ── Basic columns ────────────────────────────────────────
+    @Column(name = "first_name", nullable = false, length = 50)
+    private String firstName;
+
+    @Column(name = "last_name", nullable = false, length = 50)
+    private String lastName;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
+
+    @Column(name = "gpa")
+    private Double gpa;
+
+    // ── Enum mapping ─────────────────────────────────────────
+    @Enumerated(EnumType.STRING)   // stores "ACTIVE" not 0
+    @Column(nullable = false)
+    private StudentStatus status = StudentStatus.ACTIVE;
+
+    // ── Transient field (not persisted to DB) ─────────────────
+    @Transient
+    private String fullName;
+
+    public enum StudentStatus { ACTIVE, INACTIVE, GRADUATED }
+
+    // Constructors
+    public Student() {}
+
+    public Student(String firstName, String lastName, String email, LocalDate dob) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.dateOfBirth = dob;
+    }
+
+    // Getters and setters
+    public Long getId() { return id; }
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public LocalDate getDateOfBirth() { return dateOfBirth; }
+    public void setDateOfBirth(LocalDate dob) { this.dateOfBirth = dob; }
+    public Double getGpa() { return gpa; }
+    public void setGpa(Double gpa) { this.gpa = gpa; }
+    public StudentStatus getStatus() { return status; }
+    public void setStatus(StudentStatus status) { this.status = status; }
+
+    @Override
+    public String toString() {
+        return "Student{id=" + id + ", name=" + firstName + " " + lastName
+                + ", email=" + email + ", gpa=" + gpa + "}";
+    }
+}
+
+
+-> Spring Data Repository:
+
+Example:
+    // StudentRepository.java
+package com.jpademo.repository;
+
+import com.jpademo.entity.Student;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface StudentRepository extends JpaRepository<Student, Long> {
+
+    // ── Derived queries (Spring generates SQL from method name) ──────────
+
+    // SELECT * FROM students WHERE email = ?
+    Optional<Student> findByEmail(String email);
+
+    // SELECT * FROM students WHERE first_name = ?
+    List<Student> findByFirstName(String firstName);
+
+    // SELECT * FROM students WHERE last_name = ? AND gpa >= ?
+    List<Student> findByLastNameAndGpaGreaterThanEqual(String lastName, Double gpa);
+
+    // SELECT * FROM students WHERE email LIKE %?%
+    List<Student> findByEmailContaining(String keyword);
+
+    // SELECT * FROM students WHERE status = ?
+    List<Student> findByStatus(Student.StudentStatus status);
+
+    // SELECT * FROM students WHERE gpa BETWEEN ? AND ?
+    List<Student> findByGpaBetween(Double min, Double max);
+
+    // SELECT * FROM students ORDER BY last_name ASC
+    List<Student> findAllByOrderByLastNameAsc();
+
+    // ── Custom JPQL query ──────────────────────────────────────────────────
+    @Query("SELECT s FROM Student s WHERE s.firstName = :firstName AND s.lastName = :lastName")
+    List<Student> findByFullName(@Param("firstName") String firstName,
+                                  @Param("lastName") String lastName);
+
+    // ── Native SQL query ───────────────────────────────────────────────────
+    @Query(value = "SELECT * FROM students WHERE gpa > :gpa", nativeQuery = true)
+    List<Student> findStudentsWithGpaAbove(@Param("gpa") Double gpa);
+
+    // ── Update query ───────────────────────────────────────────────────────
+    @Modifying
+    @Query("UPDATE Student s SET s.status = :status WHERE s.id = :id")
+    int updateStudentStatus(@Param("id") Long id,
+                             @Param("status") Student.StudentStatus status);
+
+    // ── Count query ────────────────────────────────────────────────────────
+    long countByStatus(Student.StudentStatus status);
+
+    // ── Exists query ───────────────────────────────────────────────────────
+    boolean existsByEmail(String email);
+
+    // ── Pagination support ─────────────────────────────────────────────────
+    Page<Student> findByStatus(Student.StudentStatus status, Pageable pageable);
+}
