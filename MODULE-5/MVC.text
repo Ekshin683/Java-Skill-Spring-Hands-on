@@ -1,0 +1,116 @@
+Spring MVC(Model-view-controller) is a design pattern used in buiding web applications. It helps to separate the application into three interconnected components: model, view, and controller.
+
+->   Browser(HTTP request) -> Dispatcher Servlet(front controller) -> Controller(get Mapping) -> Service Layer(Business Logic) -> view(Json/Html)
+
+Example:
+
+// Product.java — Model
+package com.springdemo.model;
+
+public class Product {
+    private int id;
+    private String name;
+    private double price;
+
+    public Product(int id, String name, double price) {
+        this.id = id; this.name = name; this.price = price;
+    }
+    // getters and setters
+    public int getId() { return id; }
+    public String getName() { return name; }
+    public double getPrice() { return price; }
+}
+
+// ProductController.java — Controller Layer
+package com.springdemo.controller;
+
+import com.springdemo.model.Product;
+import com.springdemo.service.ProductService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+@Controller
+@RequestMapping("/products")
+public class ProductController {
+
+    @Autowired
+    private ProductService productService;
+
+    // GET /products — returns HTML view
+    @GetMapping
+    public String listProducts(Model model) {
+        model.addAttribute("products", productService.getAllProducts());
+        return "product-list"; // resolves to product-list.html (Thymeleaf)
+    }
+
+    // GET /products/1 — returns one product
+    @GetMapping("/{id}")
+    public String getProduct(@PathVariable int id, Model model) {
+        model.addAttribute("product", productService.getProductById(id));
+        return "product-detail";
+    }
+
+    // POST /products — create new product
+    @PostMapping
+    public String createProduct(@ModelAttribute Product product) {
+        productService.save(product);
+        return "redirect:/products"; // redirect after POST
+    }
+}
+
+// REST Controller — returns JSON instead of views
+@RestController   // = @Controller + @ResponseBody
+@RequestMapping("/api/products")
+public class ProductRestController {
+
+    @Autowired
+    private ProductService productService;
+
+    @GetMapping
+    public List<Product> getAllProducts() {
+        return productService.getAllProducts(); // automatically serialised to JSON
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> getProduct(@PathVariable int id) {
+        Product product = productService.getProductById(id);
+        if (product == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(product);
+    }
+
+    @PostMapping
+    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
+        Product saved = productService.save(product);
+        return ResponseEntity.status(201).body(saved);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Product> updateProduct(
+            @PathVariable int id, @RequestBody Product product) {
+        return ResponseEntity.ok(productService.update(id, product));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable int id) {
+        productService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+}
+
+
+// GlobalExceptionHandler.java
+@ControllerAdvice  // applies to all controllers
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<String> handleNotFound(ProductNotFoundException ex) {
+        return ResponseEntity.status(404).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGeneral(Exception ex) {
+        return ResponseEntity.status(500).body("Internal server error: " + ex.getMessage());
+    }
+}

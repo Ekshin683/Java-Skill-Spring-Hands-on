@@ -1,0 +1,1 @@
+Spring ORM(object relational Mapping) it's a technique that allows to map object-oriented domain models to relational database tables. It helps to reduce boilerplate code and simplifies database interactions by providing a higher-level abstraction over JDBC.

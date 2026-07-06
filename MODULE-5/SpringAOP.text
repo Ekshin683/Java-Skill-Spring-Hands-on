@@ -1,0 +1,75 @@
+Spring AOP(Aspect Oriented Programming) it helps to separate cross-cutting concern without disturbing main business logic like logging, security, transaction management etc..
+->These mainly says if you want to perform same functionality at multiple places in application then these helps to complete that without calling actual method or function..
+
+Example:
+    // Add to pom.xml for AOP:
+// <dependency>
+//   <groupId>org.springframework.boot</groupId>
+//   <artifactId>spring-boot-starter-aop</artifactId>
+// </dependency>
+
+package com.springdemo.aspect;
+
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.*;
+import org.springframework.stereotype.Component;
+
+@Aspect
+@Component
+public class LoggingAspect {
+
+    // Pointcut — matches ALL methods in ALL classes in com.springdemo.service package
+    @Pointcut("execution(* com.springdemo.service.*.*(..))")
+    public void serviceLayer() {}
+
+    // Before advice — runs BEFORE the matched method
+    @Before("serviceLayer()")
+    public void logBefore(JoinPoint joinPoint) {
+        System.out.println("[LOG] Before: " + joinPoint.getSignature().getName());
+    }
+
+    // After advice — runs AFTER the matched method (always, even if exception)
+    @After("serviceLayer()")
+    public void logAfter(JoinPoint joinPoint) {
+        System.out.println("[LOG] After: " + joinPoint.getSignature().getName());
+    }
+
+    // AfterReturning — runs only when method returns successfully
+    @AfterReturning(pointcut = "serviceLayer()", returning = "result")
+    public void logAfterReturning(JoinPoint joinPoint, Object result) {
+        System.out.println("[LOG] Returned: " + result);
+    }
+
+    // AfterThrowing — runs only when method throws an exception
+    @AfterThrowing(pointcut = "serviceLayer()", throwing = "error")
+    public void logAfterThrowing(JoinPoint joinPoint, Throwable error) {
+        System.out.println("[LOG] Exception in " + joinPoint.getSignature().getName()
+                + ": " + error.getMessage());
+    }
+
+    // Around advice — wraps the entire method, most powerful
+    @Around("serviceLayer()")
+    public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
+        long start = System.currentTimeMillis();
+        System.out.println("[PERF] Starting: " + joinPoint.getSignature().getName());
+
+        Object result = joinPoint.proceed(); // actually calls the real method
+
+        long duration = System.currentTimeMillis() - start;
+        System.out.println("[PERF] Finished in " + duration + "ms");
+        return result;
+    }
+}
+
+// No changes needed in business service — AOP is transparent
+package com.springdemo.service;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class ProductService {
+    public String getProduct(int id) {
+        return "Product-" + id; // AOP logging is applied automatically
+    }
+}

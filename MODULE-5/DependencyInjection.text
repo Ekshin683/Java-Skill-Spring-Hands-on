@@ -23,4 +23,25 @@ public class OrderService {
     }
 }
 
-2.Setter Injection: 
+2.Setter Injection: setter methods are used to inject dependencies. It allows optional dependencies and is more flexible.
+
+Example:
+
+    @Service@Service
+public class ReportService {
+
+    private LoggingService loggingService;
+
+    // Spring calls this setter to inject the dependency
+    @Autowired
+    public void setLoggingService(LoggingService loggingService) {
+        this.loggingService = loggingService;
+    }
+
+    public void generateReport() {
+        if (loggingService != null) {
+            loggingService.log("Generating report...");
+        }
+        System.out.println("Report generated.");
+    }
+}
