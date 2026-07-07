@@ -1,0 +1,124 @@
+Entity Auditing -> Auditing automatically tracks who created,Updated a record, without writing the service logic everytime.
+
+Example:
+// AuditConfig.java — enable auditing
+package com.jpademo.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import java.util.Optional;
+
+@Configuration
+@EnableJpaAuditing(auditorAwareRef = "auditorProvider")
+public class AuditConfig {
+
+    @Bean
+    public AuditorAware<String> auditorProvider() {
+        // In a real app, get the logged-in username from Spring Security:
+        // return () -> Optional.ofNullable(SecurityContextHolder.getContext()
+        //         .getAuthentication().getName());
+        return () -> Optional.of("system"); // hardcoded for demo
+    }
+}
+
+// Auditable.java — base class all audited entities extend
+package com.jpademo.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.MappedSuperclass;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import java.time.LocalDateTime;
+
+@MappedSuperclass              // not an entity itself, fields inherited by subclasses
+@EntityListeners(AuditingEntityListener.class)  // Spring hooks in here
+public abstract class Auditable {
+
+    @CreatedBy
+    @Column(name = "created_by", updatable = false)
+    private String createdBy;
+
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedBy
+    @Column(name = "last_modified_by")
+    private String lastModifiedBy;
+
+    @LastModifiedDate
+    @Column(name = "last_modified_at")
+    private LocalDateTime lastModifiedAt;
+
+    // Getters
+    public String getCreatedBy() { return createdBy; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public String getLastModifiedBy() { return lastModifiedBy; }
+    public LocalDateTime getLastModifiedAt() { return lastModifiedAt; }
+}
+
+
+Data Projection -> It only fetchs the data required rather than fetching every thing. which is very useful for api response time.
+
+Example:
+
+// Interface-based projection — Spring generates implementation automatically
+public interface StudentSummary {
+    String getFirstName();
+    String getLastName();
+    String getEmail();
+    // No gpa, no status — only what's declared here is fetched
+}
+
+// Class-based projection (DTO)
+public class StudentDTO {
+    private String firstName;
+    private String lastName;
+    private String email;
+
+    // Constructor must match exactly — Spring uses this for mapping
+    public StudentDTO(String firstName, String lastName, String email) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+    }
+
+    public String getFirstName() { return firstName; }
+    public String getLastName() { return lastName; }
+    public String getEmail() { return email; }
+}
+
+// StudentRepository.java — projection query methods added
+public interface StudentRepository extends JpaRepository<Student, Long> {
+
+    // Interface projection — Spring generates proxy that only fetches declared fields
+    List<StudentSummary> findAllProjectedBy();
+
+    // DTO projection using JPQL constructor expression
+    @Query("SELECT new com.jpademo.entity.StudentDTO(s.firstName, s.lastName, s.email) " +
+           "FROM Student s WHERE s.status = :status")
+    List<StudentDTO> findStudentDTOsByStatus(@Param("status") Student.StudentStatus status);
+
+    // Dynamic projection — caller chooses the type at call time
+    <T> List<T> findByStatus(Student.StudentStatus status, Class<T> type);
+}
+
+// StudentService.java — using projections
+public List<StudentSummary> getAllStudentSummaries() {
+    return studentRepository.findAllProjectedBy();
+}
+
+public List<StudentDTO> getActiveDTOs() {
+    return studentRepository.findStudentDTOsByStatus(Student.StudentStatus.ACTIVE);
+}
+
+// Dynamic projection usage
+public <T> List<T> getStudentsByStatusAs(Student.StudentStatus status, Class<T> type) {
+    return studentRepository.findByStatus(status, type);
+}

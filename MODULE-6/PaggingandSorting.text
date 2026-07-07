@@ -1,0 +1,48 @@
+Pagination -> It prevents loading thousands of data at once. It basically divides large data into particular sets mainly used in E-commerce website.
+
+Sorting -> It organizes the data in a certain way.
+
+Example:
+
+// StudentService.java — pagination and sorting methods added
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
+@Service
+public class StudentService {
+
+    // existing code above...
+
+    // ── Pagination ───────────────────────────────────────────────────────
+    public Page<Student> getStudentsPaged(int pageNumber, int pageSize) {
+        // PageRequest.of(pageNumber, pageSize)
+        // pageNumber is 0-based (page 0 = first page)
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return studentRepository.findAll(pageable);
+    }
+
+    // ── Sorting ──────────────────────────────────────────────────────────
+    public List<Student> getStudentsSortedByGpa() {
+        return studentRepository.findAll(Sort.by(Sort.Direction.DESC, "gpa"));
+    }
+
+    public List<Student> getStudentsSortedByName() {
+        return studentRepository.findAll(
+                Sort.by("lastName").ascending().and(Sort.by("firstName").ascending())
+        );
+    }
+
+    // ── Pagination + Sorting combined ─────────────────────────────────────
+    public Page<Student> getStudentsPagedAndSorted(int page, int size, String sortBy) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        return studentRepository.findAll(pageable);
+    }
+
+    // ── Pagination by status ──────────────────────────────────────────────
+    public Page<Student> getActiveStudentsPaged(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("lastName").ascending());
+        return studentRepository.findByStatus(Student.StudentStatus.ACTIVE, pageable);
+    }
+}

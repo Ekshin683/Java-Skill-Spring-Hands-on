@@ -1,0 +1,84 @@
+Multiple Data Resources -> when the server wants to connect with two or more databases at that these helps to communicate.
+
+Example:
+
+# application.properties — two datasources
+# Primary DB
+spring.datasource.primary.url=jdbc:h2:mem:primarydb
+spring.datasource.primary.driver-class-name=org.h2.Driver
+spring.datasource.primary.username=sa
+spring.datasource.primary.password=
+
+# Secondary DB
+spring.datasource.secondary.url=jdbc:h2:mem:secondarydb
+spring.datasource.secondary.driver-class-name=org.h2.Driver
+spring.datasource.secondary.username=sa
+spring.datasource.secondary.password=
+
+// PrimaryDataSourceConfig.java
+package com.jpademo.config;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import javax.sql.DataSource;
+import java.util.Properties;
+
+@Configuration
+@EnableJpaRepositories(
+    basePackages = "com.jpademo.repository.primary",   // only these repos use primary DB
+    entityManagerFactoryRef = "primaryEntityManagerFactory",
+    transactionManagerRef = "primaryTransactionManager"
+)
+public class PrimaryDataSourceConfig {
+
+    @Primary
+    @Bean
+    @ConfigurationProperties("spring.datasource.primary")
+    public DataSourceProperties primaryDataSourceProperties() {
+        return new DataSourceProperties();
+    }
+
+    @Primary
+    @Bean
+    public DataSource primaryDataSource() {
+        return primaryDataSourceProperties().initializeDataSourceBuilder().build();
+    }
+
+    @Primary
+    @Bean
+    public LocalContainerEntityManagerFactoryBean primaryEntityManagerFactory(
+            @Qualifier("primaryDataSource") DataSource dataSource) {
+
+        LocalContainerEntityManagerFactoryBean factory =
+                new LocalContainerEntityManagerFactoryBean();
+        factory.setDataSource(dataSource);
+        factory.setPackagesToScan("com.jpademo.entity.primary");
+        factory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+
+        Properties props = new Properties();
+        props.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+        props.put("hibernate.hbm2ddl.auto", "create-drop");
+        props.put("hibernate.show_sql", "true");
+        factory.setJpaProperties(props);
+
+        return factory;
+    }
+
+    @Primary
+    @Bean
+    public JpaTransactionManager primaryTransactionManager(
+            @Qualifier("primaryEntityManagerFactory")
+            LocalContainerEntityManagerFactoryBean factory) {
+        return new JpaTransactionManager(factory.getObject());
+    }
+}
+
+->There are three main features of Hibernates 1.Named Query(@NamedQuery) 2.Batch Processing(By batches we retrive data) 3.Caching(alternative database base, small in size than we fetch from there where we use the data most frequently).
