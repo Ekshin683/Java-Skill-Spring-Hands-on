@@ -1,0 +1,12 @@
+SonarQube -> It's a platform for continuous code inspection. Basic compiler only check any syntactical errors. But SonarQube automatically reviews code sytax,code clean, bugs, vulnerability and Quality Metrics every thing.
+
+->It follows "Clean as You Code" principle
+->The philosophy of SonarQube is "fix it before it shifts, not after".
+
+->there are few core components in SonarQube    
+1.Web Server(browser UI) 2.Computer Analysis(Scan Entire code and provide result)
+3.Search Server(Ensure fast and filtering) 4.Sonar DataBase(Stores all bugs,metrics, History,etc..)
+5.SonarScanner(Sends report to Computer Engine).
+
+Quality Profile: Set of rules for SonarQube In java 8. create custom profile for Sonar Way, enable and disable specific, Change Severity rule,Assign different profile to different projects.
+
