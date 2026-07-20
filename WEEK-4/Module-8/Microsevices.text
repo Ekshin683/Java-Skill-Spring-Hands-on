@@ -1,0 +1,18 @@
+Microservices: It's a Archietuectural Style where large applications are divided into small independent servers - each responsible for it's own part of code of deployable.
+->single responsibility - Each server is responsible for it's own business logic. If one fails it doesn't effect another server.
+->Decentralized Data Management - Every server owns it's own database. it contact via Api calls and every database doesn't share same schema.
+
+Monolithic: It's a large single codebase where every thing depend on one server which makes applications complex to work properly.
+
+Eureka Server - When one server calls another server it doesn't call manually like "LocalHost:8080" it asks asks where is the server these makes service location transparent. Can move, scale and restart the server.
+Config Server - InsteadOf having multiple application.properties these helps to everything in one file at the stratup is picks the properties from these file.
+Order Server - It calls userserver to validate user It  uses Feign client(REST) InsteadOf of manual boilerplates.
+
+-> Circuit Breaker - When User server fails repeatedly these breaks and stop calling - returns throws a message Timeouts.
+
+
+API GateWay - These is the entire point of the request from clients.It routes to correct server, authentication, Loggers and Rate Limiting.
+
+Asynchronous Communication - For operations that don't need an immediate response (email notifications, audit logs, analytics), services communicate through message queues instead of direct HTTP calls. This decouples services completely.
+
+Monitoring with Actutor + Micrometer : 
