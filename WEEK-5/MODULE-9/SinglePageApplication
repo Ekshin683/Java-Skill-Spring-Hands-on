@@ -1,0 +1,30 @@
+Single Page Application(SPA): InsteadOf reloading entire page these SPA helps to load once and then javascript dynamically updates the components on the application using virtual DOM.
+
+
+React: It's a javascript libraray which helps to build UI interfaces using components and manage their own state and it uses virtual DOM for running application which only updates the components where the changes are made rather then rendering whole page
+
+JSX(javascript XML) which helps to write code in HTML inside javascript and later react tranforms code into javascript file to execute it
+
+EX:
+const element = <h1>Hello, World!</h1>;
+const name = "Alice";
+const greeting = <h1>Hello, {name}!</h1>;
+const sum = <p>2 + 2 = {2 + 2}</p>;
+const box = (
+    <div
+        className="box"
+        style={{ color: 'blue', fontSize: '16px' }}
+        onClick={() => alert('clicked')}
+    >
+        Click me
+    </div>
+);
+const multiLine = (
+    <>
+        <h1>Title</h1>
+        <p>Paragraph</p>
+    </>
+);
+const input = <input type="text" />;
+const img = <img src="logo.png" alt="logo" />;
+
