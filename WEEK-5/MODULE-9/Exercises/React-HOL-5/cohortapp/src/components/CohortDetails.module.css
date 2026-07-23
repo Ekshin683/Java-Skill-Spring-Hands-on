@@ -1,0 +1,17 @@
+/* CSS Module — class names are locally scoped to this component */
+/* They won't clash with class names in other files */
+
+.box {
+  width: 300px;
+  display: inline-block;
+  margin: 10px;
+  padding: 10px 20px;
+  border: 1px solid black;
+  border-radius: 10px;
+  vertical-align: top;
+}
+
+/* Tag selector — targets all <dt> elements inside this module */
+dt {
+  font-weight: 500;
+}
