@@ -10,8 +10,6 @@ public class Country {
 
     private String code;
     private String name;
-
-    // Empty constructor required by Spring for property injection
     public Country() {
         LOGGER.debug("Inside Country Constructor.");
     }

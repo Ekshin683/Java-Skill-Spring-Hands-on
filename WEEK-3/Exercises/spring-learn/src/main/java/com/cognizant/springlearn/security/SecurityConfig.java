@@ -17,8 +17,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(SecurityConfig.class);
-
-    // Configure in-memory users with roles
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         LOGGER.info("Start");
@@ -38,8 +36,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         LOGGER.info("Start");
         return new BCryptPasswordEncoder();
     }
-
-    // Configure HTTP security rules + JWT filter
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         LOGGER.info("Start");

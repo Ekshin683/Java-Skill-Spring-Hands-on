@@ -35,11 +35,7 @@ public class CountryController {
         LOGGER.debug("Returning: {}", country);
         LOGGER.info("End");
         return country;
-        // Spring automatically converts Country object to JSON
-        // because @RestController + Jackson is on classpath
     }
-
-    // GET /countries — returns all countries from country.xml
     @GetMapping("/countries")
     public List<Country> getAllCountries() {
         LOGGER.info("Start");
@@ -48,9 +44,6 @@ public class CountryController {
         LOGGER.info("End");
         return countries;
     }
-
-    // GET /countries/{code} — returns specific country by code
-    // @PathVariable extracts {code} from the URL
     @GetMapping("/countries/{code}")
     public Country getCountry(@PathVariable String code)
             throws CountryNotFoundException {
