@@ -1,0 +1,17 @@
+1.Create Files -> touch sample.log
+
+2.Create Folder -> mkdir log
+
+3.Create file -> echo test > log/text.txt
+
+4.Create .gitignore -> touch .gitignore
+
+5.To Open -> notepad .gitignore
+
+6.ADD -> *.log/
+
+7. Stage -> git add.
+
+8.Commit git commit -m "Update"
+
+9.Verify -> git Status

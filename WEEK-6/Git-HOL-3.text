@@ -1,0 +1,14 @@
+1.Branching -> git branch GitNewBranch
+
+2.View Branch -> git branch
+
+3.Switch Branch -> git checkout GitNewBranch
+
+4.Status -> git Status
+
+5.Merge -> git checkout master
+        -> git diff master GitNewBranch
+        ->git merge GitNewBranch
+        ->git log --oneline --graph --decorate
+        ->git branch -d GitNewBranch
+        ->git Status

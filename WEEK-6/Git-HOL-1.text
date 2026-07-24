@@ -1,0 +1,33 @@
+1.Version check -> git --Version
+
+2.Configure Username -> git config --global user.name "Name"
+
+3.Configure Email -> git config --global user.email "mail@gmail.com"
+
+4.Verify Configuration -> git config --global --list
+
+5.Configure Notepad ++ as Default Editor -> git config --global core.editor "notepad++"
+
+6.Create Repository -> git init GitDemo  (to Move) -> cd GitDemo
+
+7.Check Hidden Files -> ls -al
+
+8.create welcome.txt -> echo "Welcome to the version control" > welcome.txt
+
+9.Verify file -> ls -al;
+
+10. Display File -> welcome.txt
+
+11.Check Staus -> git Status
+
+12.Stage File -> git add welcome.txt
+
+13.Commit -> git commit -m "Update"
+
+14.git Status
+
+15.git remote add origin "Git gub Link"
+
+16.Pull Request -> git pull origin master
+
+17.Push Request -> git push -u origin main

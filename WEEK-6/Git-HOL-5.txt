@@ -1,0 +1,4 @@
+Push To Remote -> git Status
+               -> git Branch
+               -> git pull origin master
+               -> git push origin master

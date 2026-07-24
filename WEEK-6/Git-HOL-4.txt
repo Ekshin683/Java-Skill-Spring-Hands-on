@@ -1,0 +1,20 @@
+MERGE CONFLICT -> git Status
+               -> git branch Gitwork
+               -> git checkout Gitwork
+               -> echo "Branch Version" > hello.xml
+               -> git add hello.xml
+               -> git commit -m "ADDED"
+               -> git checkout master
+               -> echo "Master Version" > hello.xml
+               -> git add hello.xml
+               -> git commit -m "ADDED"
+               -> git log --oneline --graph --decorate --all
+               -> git diff master Gitwork
+               -> git merge Gitwork
+               -> git add hello.xml
+               -> git commit -m "Resolved"
+               -> git add .gitignore
+               -> git commit -m "ADDED"
+               -> git branch
+               -> git branch -d Gitwork
+               -> git log --oneline --graph --decorate
